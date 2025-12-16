@@ -98,6 +98,11 @@ def scrap_course_metadata(driver: Driver, data):
                 'total length', ' total length')
         print('Stats:', coco_stats_list)
 
+    span_instructor = soup.find('div', attrs={
+        'data-purpose': 'instructor-name-top'})
+    instructor = span_instructor.find('a').text
+    print('Instructor:', instructor)
+
     # Testing clicking necessary button
     expand_content_button = driver.get_element_containing_text(
             'Expand all sections')
