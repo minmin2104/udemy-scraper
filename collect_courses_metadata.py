@@ -52,7 +52,7 @@ def scrap_course_metadata(driver: Driver, data):
     wait_time = [Wait.SHORT, Wait.LONG, Wait.VERY_LONG]
 
     driver.get(
-            free_url,
+            paid_url,
             bypass_cloudflare=True,
             wait=random.choice(wait_time)
             )
@@ -96,6 +96,8 @@ def scrap_course_metadata(driver: Driver, data):
         # hhmmsstotal length (not a typo)
         coco_stats_list[-1] = coco_stats_list[-1].replace(
                 'total length', ' total length')
+        coco_stats_list[-1] = coco_stats_list[-1].replace(
+                '\xa0', ' ')
         print('Stats:', coco_stats_list)
 
     span_instructor = soup.find('div', attrs={
