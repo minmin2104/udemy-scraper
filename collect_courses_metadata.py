@@ -33,7 +33,7 @@ def scrap_course_metadata(driver: Driver, data):
     - lead-course-locale
     - rating-number
     - enrollment
-    - course-content-length
+    - curriculum-stats
     - instructor-name-top
     - what-you-will-learn @ objective--objective-item
     - requirements: div.ud-block-list-item-content
@@ -52,7 +52,7 @@ def scrap_course_metadata(driver: Driver, data):
     wait_time = [Wait.SHORT, Wait.LONG, Wait.VERY_LONG]
 
     driver.get(
-            paid_url,
+            free_url,
             bypass_cloudflare=True,
             wait=random.choice(wait_time)
             )
@@ -64,9 +64,39 @@ def scrap_course_metadata(driver: Driver, data):
     title_tag = soup.find('h1', attrs={'data-purpose': 'lead-title'})
     title = title_tag.text
     print('Title:', title)
+
+    # Get headline here
     title_headline = soup.find('div', attrs={'data-purpose': 'lead-headline'})
     headline = title_headline.text
     print('Headline:', headline)
+
+    # Get locale
+    locale_div = soup.find('div', attrs={'data-purpose': 'lead-course-locale'})
+    locale = locale_div.text
+    print('Locale:', locale)
+
+    # Rating numbers
+    span_rating = soup.find('span', attrs={'data-purpose': 'rating-number'})
+    rating = span_rating.text
+    print(f'Rating: {rating} / 5')
+
+    # Get enrollment
+    enroll_div = soup.find('div', attrs={'data-purpose': 'enrollment'})
+    enrollment = enroll_div.text
+    print('Enrollment:', enrollment)
+
+    # Get curriculum stats
+    coco_stats = soup.find('div', attrs={'data-purpose': 'curriculum-stats'})
+    target_span = coco_stats.find('span')
+    coco_stats_list = []
+    if target_span:
+        full_text = target_span.get_text(strip=True)
+        coco_stats_list = full_text.split('•')
+        coco_stats_list = [text.strip() for text in coco_stats_list]
+        # hhmmsstotal length (not a typo)
+        coco_stats_list[-1] = coco_stats_list[-1].replace(
+                'total length', ' total length')
+        print('Stats:', coco_stats_list)
 
     # Testing clicking necessary button
     expand_content_button = driver.get_element_containing_text(
