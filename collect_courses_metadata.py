@@ -23,6 +23,37 @@ def get_courses_links(filename):
     return courses_links
 
 
+def is_courses_free(div_price_tag):
+    is_free = False
+    spans = div_price_tag.find_all('span')
+    for span in spans:
+        if span.text == "Free":
+            is_free = True
+            break
+    return is_free
+
+
+def get_free_courses_objective(div_content):
+    obj_div = div_content.find_all(
+            'div',
+            attrs={'class': 'objective--objective-item--0gf07'})
+    obj = []
+    for div in obj_div:
+        obj_span = div.find('span')
+        obj.append(obj_span.text)
+
+    return obj
+
+
+def get_paid_courses_objective(soup):
+    obj_div = soup.find_all('div', attrs={'data-purpose': 'objective'})
+    obj = []
+    for elem in obj_div:
+        obj_span = elem.find('span')
+        obj.append(obj_span.text)
+    return obj
+
+
 @browser
 def scrap_course_metadata(driver: Driver, data):
     '''
@@ -35,7 +66,7 @@ def scrap_course_metadata(driver: Driver, data):
     - enrollment
     - curriculum-stats
     - instructor-name-top
-    - what-you-will-learn @ objective--objective-item
+    - objective @ content-container-wrapper
     - requirements: div.ud-block-list-item-content
     - safely-set-inner-html:description:description
 
@@ -52,7 +83,7 @@ def scrap_course_metadata(driver: Driver, data):
     wait_time = [Wait.SHORT, Wait.LONG, Wait.VERY_LONG]
 
     driver.get(
-            paid_url,
+            free_url,
             bypass_cloudflare=True,
             wait=random.choice(wait_time)
             )
@@ -100,10 +131,17 @@ def scrap_course_metadata(driver: Driver, data):
                 '\xa0', ' ')
         print('Stats:', coco_stats_list)
 
+    # Get instructor name
     span_instructor = soup.find('div', attrs={
         'data-purpose': 'instructor-name-top'})
     instructor = span_instructor.find('a').text
     print('Instructor:', instructor)
+
+    price_text_div = soup.find('div', attrs={
+        'data-purpose': 'course-price-text'
+        })
+    is_free = is_courses_free(price_text_div)
+    print('Is Free:', is_free)
 
     # Testing clicking necessary button
     expand_content_button = driver.get_element_containing_text(
@@ -114,6 +152,17 @@ def scrap_course_metadata(driver: Driver, data):
     show_more_button = driver.get_element_containing_text('Show more')
     if show_more_button:
         show_more_button.click()
+
+    course_objectives = []
+    if is_free:
+        div_content_wrapper = soup.find(
+                'div', attrs={'data-purpose': 'content-container-wrapper'})
+        course_objectives = get_free_courses_objective(div_content_wrapper)
+    else:
+        course_objectives = get_paid_courses_objective(soup)
+
+    print(f'Found {len(course_objectives)} objectives')
+    print('Courses Objs:', course_objectives)
 
     driver.prompt()
 
