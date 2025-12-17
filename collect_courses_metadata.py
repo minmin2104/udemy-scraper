@@ -83,7 +83,7 @@ def scrap_course_metadata(driver: Driver, data):
     wait_time = [Wait.SHORT, Wait.LONG, Wait.VERY_LONG]
 
     driver.get(
-            free_url,
+            paid_url,
             bypass_cloudflare=True,
             wait=random.choice(wait_time)
             )
@@ -163,6 +163,18 @@ def scrap_course_metadata(driver: Driver, data):
 
     print(f'Found {len(course_objectives)} objectives')
     print('Courses Objs:', course_objectives)
+
+    # Get courses requirements
+    requirements = []
+    div_req = soup.find('h2', attrs={'data-purpose': 'requirements-title'})
+    ul_req_cont = div_req.find_next('ul')
+    div_req_content = ul_req_cont.find_all(
+            'div', attrs={'class': 'ud-block-list-item-content'})
+    for div in div_req_content:
+        requirements.append(div.text)
+
+    print(f'Found {len(requirements)} requirements')
+    print(requirements)
 
     driver.prompt()
 
