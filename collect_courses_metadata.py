@@ -2,6 +2,7 @@ import json
 import random
 from botasaurus.browser import browser, Driver, Wait
 from botasaurus.soupify import soupify
+from markdownify import markdownify as md
 
 
 def get_courses_links(filename):
@@ -54,7 +55,7 @@ def get_paid_courses_objective(soup):
     return obj
 
 
-@browser
+@browser(reuse_driver=True)
 def scrap_course_metadata(driver: Driver, data):
     '''
     references html elemenet with unique attribute
@@ -80,7 +81,7 @@ def scrap_course_metadata(driver: Driver, data):
     free_url = f'{base_url}{courses_links[1]}'
     print(f'Targeting {free_url} for testing...')
 
-    wait_time = [Wait.SHORT, Wait.LONG, Wait.VERY_LONG]
+    wait_time = [Wait.SHORT, Wait.LONG]
 
     driver.get(
             paid_url,
@@ -137,13 +138,16 @@ def scrap_course_metadata(driver: Driver, data):
     instructor = span_instructor.find('a').text
     print('Instructor:', instructor)
 
+    # TODO: This checking if free need to be changed
+    # Instead of looking at the price text,
+    # look at body's attribute instead
     price_text_div = soup.find('div', attrs={
         'data-purpose': 'course-price-text'
         })
     is_free = is_courses_free(price_text_div)
     print('Is Free:', is_free)
 
-    # Testing clicking necessary button
+    # Clicking necessary button
     expand_content_button = driver.get_element_containing_text(
             'Expand all sections')
     if expand_content_button:
@@ -175,6 +179,22 @@ def scrap_course_metadata(driver: Driver, data):
 
     print(f'Found {len(requirements)} requirements')
     print(requirements)
+
+    # Get description
+    desc_div = soup.find('div', attrs={'data-purpose': 'safely-set-inner-html:description:description'})
+    desc_div_str = str(desc_div)
+    with open('./tmp_desc.md', 'w') as f:
+        # Debug purposes only
+        text = md(desc_div_str)
+        f.write(text)
+
+    # Get target audience
+    div_target = soup.find('div', attrs={'data-purpose': 'target-audience'})
+    ul_target = div_target.find('ul')
+    with open('./tmp_target.md', 'w') as f:
+        # Debug purposes only
+        text = md(str(ul_target))
+        f.write(text)
 
     driver.prompt()
 
