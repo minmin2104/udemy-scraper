@@ -70,6 +70,7 @@ def scrap_course_metadata(driver: Driver, data):
     - objective @ content-container-wrapper
     - requirements: div.ud-block-list-item-content
     - safely-set-inner-html:description:description
+    - course content
 
     For free courses, click `show more` and `expand all section`
     For paid courses, click `expand all section` only
@@ -82,9 +83,10 @@ def scrap_course_metadata(driver: Driver, data):
     print(f'Targeting {free_url} for testing...')
 
     wait_time = [Wait.SHORT, Wait.LONG]
+    url = paid_url
 
     driver.get(
-            paid_url,
+            url,
             bypass_cloudflare=True,
             wait=random.choice(wait_time)
             )
@@ -183,20 +185,44 @@ def scrap_course_metadata(driver: Driver, data):
     # Get description
     desc_div = soup.find('div', attrs={'data-purpose': 'safely-set-inner-html:description:description'})
     desc_div_str = str(desc_div)
-    with open('./tmp_desc.md', 'w') as f:
-        # Debug purposes only
-        text = md(desc_div_str)
-        f.write(text)
+    description = md(desc_div_str)
 
     # Get target audience
     div_target = soup.find('div', attrs={'data-purpose': 'target-audience'})
     ul_target = div_target.find('ul')
-    with open('./tmp_target.md', 'w') as f:
-        # Debug purposes only
-        text = md(str(ul_target))
-        f.write(text)
+    target_audience = md(str(ul_target))
 
-    driver.prompt()
+    # Get course content
+    curriculum_div = soup.find('div', attrs={'data-purpose': 'course-curriculum'})
+    # Get heading of a subtitle
+    curriculum_div_content = curriculum_div.find_all('div', attrs={'class': 'accordion-panel-module--panel--Eb0it section--panel--qYPjj'})
+    curriculum_content = dict()
+    for div in curriculum_div_content:
+        sec_cont = div.find('span', attrs={'data-purpose': 'section-content'})
+        span_header = sec_cont.previous_sibling
+        header = span_header.get_text()
+        curriculum_content[header] = []
+        curr_contents = div.find_all('span', attrs={'data-testid': 'course-lecture-title'})
+        for cont in curr_contents:
+            curriculum_content[header].append(cont.get_text())
+
+    print(curriculum_content)
+
+    return {
+            'Url': url,
+            'Title': title,
+            'Headline': headline,
+            'Locale': locale,
+            'Rating': f'{rating} / 5',
+            'Enrollment': enrollment,
+            'Instructor': instructor,
+            'Curriculum Stats': coco_stats_list,
+            'Course Objective': course_objectives,
+            'Requirements': requirements,
+            'Description': description,
+            'Target audience': target_audience,
+            'Curriculum Content': curriculum_content
+            }
 
 
 if __name__ == '__main__':
