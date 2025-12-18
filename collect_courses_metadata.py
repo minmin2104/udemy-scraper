@@ -4,7 +4,7 @@ from my_log import MyLog
 from datetime import datetime
 from botasaurus.soupify import soupify
 from markdownify import markdownify as md
-from botasaurus.browser import browser, Driver, Wait
+from botasaurus.browser import browser, Driver
 
 
 my_log = MyLog()
