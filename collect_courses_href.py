@@ -121,14 +121,21 @@ Links found: {len(curr_href)} | {original_url}')
         log_both(f"Error scraping {original_url}: {str(e)}")
         return {'url': original_url, 'courses_links': courses_links,
                 'error': True,
-                'last_page': page
+                'last_page': page,
+                'max_page': max_page
                 }
 
     # remove duplicate courses href
     distinct_links = list(set(courses_links))
     log_both(f'Found {len(distinct_links)} distinct courses')
 
-    return {'url': original_url, 'courses_links': distinct_links}
+    return {
+            'url': original_url,
+            'courses_links': distinct_links,
+            'error': False,
+            'last_page': page,
+            'max_page': max_page
+            }
 
 
 if __name__ == '__main__':
