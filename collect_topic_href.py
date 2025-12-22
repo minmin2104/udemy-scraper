@@ -29,12 +29,12 @@ def scrap_topic_href(driver: Driver, data):
             wait=Wait.LONG
             )
     href = []
-    for i in range(17):
+    for i in range(13):
         soup = soupify(driver.page_html)
         html_a_tags = soup.find_all('a', attrs={'data-testid': 'browse-nav-item'})
         for tag in html_a_tags:
             curr_href = tag.get('href')
-            if curr_href and ('/courses' in curr_href or '/topic' in curr_href):
+            if curr_href and '/courses' in curr_href:
                 href.append(curr_href)
         driver.prompt()
 
