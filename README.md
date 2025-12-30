@@ -5,7 +5,7 @@ than the rewrite version or master branch.
 
 ## Note
 
-**Phase 1**
+- [x] **Phase 1**
 1. Browse https://www.udemy.com/sitemap.xml
 2. Extract the XML data
 3. Go to each course xml sitemap
