@@ -36,6 +36,6 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github"
-          git add output/*
-          git commit -m "Save output to github"
+          git add .
+          git commit -m "Save details to github"
           git push
