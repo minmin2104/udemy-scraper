@@ -1,11 +1,16 @@
 import json
 from botasaurus.browser import browser, Driver
 from my_log import MyLog
+import time
+from datetime import datetime
+import os
 
-
+MAX_RUNTIME_SECONDS = 5 * 60 * 60
+START_TIME = time.time()
 mylog = MyLog()
 log = mylog.log
 log_time = mylog.log_time
+OUTPUT_NAME = os.getenv("SCRAPE_OUTPUT", datetime.utcnow().strftime("%Y%m%d_%H%M%S"))  # noqa
 
 
 def get_courses_links():
@@ -13,15 +18,24 @@ def get_courses_links():
     links = []
     with open(courses_link_path, "r") as f:
         links = json.load(f)
-    return links
+    try:
+        with open("processed.json", "r") as f:
+            done = json.load(f)
+    except FileNotFoundError:
+        done = []
+    return list(set(links) - set(done))
 
 
 @browser(
-        output="test_5_course_data",
+        output=OUTPUT_NAME,
         parallel=5,
         max_retry=5
         )
 def get_course_data(driver: Driver, data):
+    if time.time() - START_TIME > MAX_RUNTIME_SECONDS:
+        log("Time limit reached. Skipping remaining task")
+        return None
+    log(f"Scraping: {data}")
     slug = data.rstrip("/").split("/course/")[1]
     link_1 = f"https://www.udemy.com/api-2.0/courses/{slug}/?fields[course]=@all"  # noqa
 
@@ -45,10 +59,32 @@ def get_course_data(driver: Driver, data):
     return data
 
 
+def get_processed_url(path):
+    try:
+        with open(path, "r") as f:
+            processed = json.load(f)
+    except FileNotFoundError:
+        processed = []
+    return processed
+
+
+def write_processed_url(path, data):
+    with open(path, "w") as f:
+        json.dump(data, f, indent=4)
+
+
 @log_time
 def main():
-    links = get_courses_links()[:5]
-    get_course_data(links)
+    links = get_courses_links()
+    res = get_course_data(links)
+
+    process_json = "processed.json"
+    processed_urls = get_processed_url(process_json)
+    processed_urls = set(processed_urls)
+    for data in res:
+        if data:
+            processed_urls.add(data["url"])
+    write_processed_url(process_json, list(processed_urls))
 
 
 if __name__ == "__main__":
