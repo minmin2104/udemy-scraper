@@ -2,15 +2,14 @@ import json
 from botasaurus.browser import browser, Driver
 from my_log import MyLog
 import time
-from datetime import datetime
 import os
 
-MAX_RUNTIME_SECONDS = 5 * 60 * 60
+MAX_RUNTIME_SECONDS = 2 * 60 * 60
 START_TIME = time.time()
 mylog = MyLog()
 log = mylog.log
 log_time = mylog.log_time
-OUTPUT_NAME = os.getenv("SCRAPE_OUTPUT", datetime.utcnow().strftime("%Y%m%d_%H%M%S"))  # noqa
+OUTPUT_NAME = os.getenv("SCRAPE_OUTPUT")
 
 
 def get_courses_links():
@@ -27,6 +26,7 @@ def get_courses_links():
 
 
 @browser(
+        cache=True,
         output=OUTPUT_NAME,
         parallel=5,
         max_retry=5
@@ -43,6 +43,8 @@ def get_course_data(driver: Driver, data):
     driver.google_get(link_1, bypass_cloudflare=True)
     course_json = driver.get_text("pre")
     course_data = json.loads(course_json)
+    if "id" not in course_data:
+        return None
     course_id = course_data["id"]
 
     link_2 = f"https://www.udemy.com/api-2.0/course-landing-components/{course_id}/me/?components=curriculum_context"  # noqa
