@@ -1,3 +1,5 @@
 __pycache__/
 cache/
 output/
+logs/
+error_logs/
