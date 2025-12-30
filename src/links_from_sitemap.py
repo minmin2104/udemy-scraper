@@ -4,16 +4,6 @@ from datetime import datetime
 import xml.etree.ElementTree as etree
 
 
-# @request(
-#         output=None
-#         )
-# def get_sub_sitemaps(request: Request, url):
-#     response = request.get(url)
-#     soup = BeautifulSoup(response.text, "xml")
-#     links = [loc.text for loc in soup.find_all('loc')]
-#     time.sleep(random.uniform(1, 2))
-#     return links
-
 def get_sub_sitemaps(path):
     tree = None
     with open(path, "r") as f:
