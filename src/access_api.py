@@ -9,7 +9,7 @@ START_TIME = time.time()
 mylog = MyLog()
 log = mylog.log
 log_time = mylog.log_time
-OUTPUT_NAME = os.getenv("SCRAPE_OUTPUT")
+BATCH_NUM = os.getenv("BATCH_NUM")
 
 
 def get_courses_links(path):
@@ -22,7 +22,7 @@ def get_courses_links(path):
 
 @browser(
         cache=True,
-        output=f"batch_{OUTPUT_NAME}",
+        output=f"batch_{BATCH_NUM}",
         parallel=5,
         max_retry=5
         )
@@ -72,7 +72,7 @@ def write_processed_url(path, data):
 
 @log_time
 def main():
-    path = f"batches/batch_{os.getenv('BATCH_NUM')}.json"
+    path = f"batches/batch_{BATCH_NUM}.json"
     links = get_courses_links(path)
     get_course_data(links)
 
