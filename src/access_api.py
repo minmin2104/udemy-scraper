@@ -12,8 +12,8 @@ log_time = mylog.log_time
 OUTPUT_NAME = os.getenv("SCRAPE_OUTPUT")
 
 
-def get_courses_links():
-    courses_link_path = "all_courses_link.json"
+def get_courses_links(path):
+    courses_link_path = path
     links = []
     with open(courses_link_path, "r") as f:
         links = json.load(f)
@@ -22,7 +22,7 @@ def get_courses_links():
 
 @browser(
         cache=True,
-        output=OUTPUT_NAME,
+        output=f"batch_{OUTPUT_NAME}",
         parallel=5,
         max_retry=5
         )
@@ -72,7 +72,8 @@ def write_processed_url(path, data):
 
 @log_time
 def main():
-    links = get_courses_links()
+    path = f"batches/batch_{os.getenv('BATCH_NUM')}.json"
+    links = get_courses_links(path)
     get_course_data(links)
 
 
