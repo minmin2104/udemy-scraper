@@ -4,7 +4,7 @@ from my_log import MyLog
 import time
 import os
 
-MAX_RUNTIME_SECONDS = 2 * 60 * 60
+MAX_RUNTIME_SECONDS = 3 * 60 * 60
 START_TIME = time.time()
 mylog = MyLog()
 log = mylog.log
@@ -17,12 +17,7 @@ def get_courses_links():
     links = []
     with open(courses_link_path, "r") as f:
         links = json.load(f)
-    try:
-        with open("processed.json", "r") as f:
-            done = json.load(f)
-    except FileNotFoundError:
-        done = []
-    return list(set(links) - set(done))
+    return links
 
 
 @browser(
@@ -78,15 +73,7 @@ def write_processed_url(path, data):
 @log_time
 def main():
     links = get_courses_links()
-    res = get_course_data(links)
-
-    process_json = "processed.json"
-    processed_urls = get_processed_url(process_json)
-    processed_urls = set(processed_urls)
-    for data in res:
-        if data:
-            processed_urls.add(data["url"])
-    write_processed_url(process_json, list(processed_urls))
+    get_course_data(links)
 
 
 if __name__ == "__main__":
