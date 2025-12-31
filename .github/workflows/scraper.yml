@@ -2,11 +2,8 @@ name: Udemy data scraper
 on:
   workflow_dispatch:
     inputs:
-      output_name:
+      batch_num:
         description: "Result output filename"
-        required: true
-      input_name:
-        description: "Batch input file"
         required: true
 jobs:
   scrape:
@@ -32,8 +29,7 @@ jobs:
 
       - name: Run Python
         run: |
-          export SCRAPE_OUTPUT=${{ github.event.inputs.output_name }}
-          export BATCH_NUM=${{ github.event.inputs.input_name }}
+          export BATCH_NUM=${{ github.event.inputs.batch_num }}
           xvfb-run python src/access_api.py
 
       - name: Save result
