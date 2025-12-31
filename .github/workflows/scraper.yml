@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
     inputs:
       batch_num:
-        description: "Result output filename"
+        description: "Batch num for input and output"
         required: true
 jobs:
   scrape:
