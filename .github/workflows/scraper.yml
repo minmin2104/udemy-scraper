@@ -31,11 +31,12 @@ jobs:
         run: |
           export BATCH_NUM=${{ github.event.inputs.batch_num }}
           xvfb-run python src/access_api.py
+          python src/zip_result.py
 
       - name: Save result
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github"
-          git add .
+          git add output_zip/*
           git commit -m "Save details to github"
           git push
