@@ -77,7 +77,7 @@ def write_processed_url(path, data):
 def main():
     path = f"batches/batch_{BATCH_NUM}.json"
     links = get_courses_links(path)
-    get_course_data(links[:3])
+    get_course_data(links)
 
 
 if __name__ == "__main__":
