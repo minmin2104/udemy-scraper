@@ -5,6 +5,7 @@ def filter_courses_data(data: dict):
         "headline": data.get("headline"),
         "url": data.get("url"),
         "price": data.get("price"),
+        "locale": data.get("locale", {}).get("locale"),
         "instructor": {
             "name": data.get("visible_instructors", [{}])[0].get("display_name"),
             "job_title": data.get("visible_instructors", [{}])[0].get("job_title"),

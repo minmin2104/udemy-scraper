@@ -1,1 +1,2 @@
 git+https://github.com/minmin2104/botasaurus.git
+pandas
