@@ -64,11 +64,17 @@ def convert_course_to_master_csv(json_data):
 
 if __name__ == "__main__":
     rows = []
-    with open('tmp.json', 'r') as f:
+    batch = "batch_00"
+    filename = f"{batch}.json"
+    with open(filename, 'r') as f:
         datas = json.load(f)
         for data in datas:
-            row = convert_course_to_master_csv(data)
-            rows.extend(row)
+            if data:
+                print(data["url"])
+                row = convert_course_to_master_csv(data)
+                rows.extend(row)
+            else:
+                print("null")
         df = pd.DataFrame(rows)
-        df.to_csv("course_master_data.csv", index=False, encoding="utf-8-sig")
+        df.to_csv(f"{batch}.csv", index=False, encoding="utf-8-sig")
         print(f"Master CSV created with {len(df.columns)} columns and {len(df)} rows.")  # noqa
