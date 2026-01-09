@@ -4,4 +4,5 @@ logs/
 output/
 error_logs/
 output_csv/
+output_json/
 unzip_output.sh
