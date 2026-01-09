@@ -3,3 +3,5 @@ cache/
 logs/
 output/
 error_logs/
+output_csv/
+unzip_output.sh
