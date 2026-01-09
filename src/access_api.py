@@ -42,19 +42,19 @@ def get_course_data(driver: Driver, data):
     if "id" not in course_data:
         return None
     course_id = course_data["id"]
-    filtered_course = filter_courses_json.filter_courses_data(course_data)
+    # filtered_course = filter_courses_json.filter_courses_data(course_data)
 
     link_2 = f"https://www.udemy.com/api-2.0/course-landing-components/{course_id}/me/?components=curriculum_context"  # noqa
     driver.short_random_sleep()
     driver.google_get(link_2, bypass_cloudflare=True)
     curriculum_json = driver.get_text("pre")
     curriculum_data = json.loads(curriculum_json)
-    filtered_curriculum = filter_courses_json.filter_curriculum_data(curriculum_data)
+    # filtered_curriculum = filter_courses_json.filter_curriculum_data(curriculum_data)
 
     data = {
             "url": data,
-            "course_data": filtered_course,
-            "curriculum_data": filtered_curriculum,
+            "course_data": course_data,
+            "curriculum_data": curriculum_data,
             }
     return data
 

@@ -1,6 +1,7 @@
 import pandas as pd
 import json
 import re
+import os
 
 CLEANR = re.compile('<.*?>')
 
@@ -12,7 +13,7 @@ def clean_html(raw_html):
     return re.sub(CLEANR, '', raw_html).strip()
 
 
-def convert_course_to_master_csv(json_data):
+def create_csv_rows(json_data):
     cd = json_data.get("course_data", {})
 
     # 1. Prepare Course-Level Data (Repeating Columns)
@@ -62,19 +63,24 @@ def convert_course_to_master_csv(json_data):
     return rows
 
 
-if __name__ == "__main__":
+def dump_to_csv(path, filename):
     rows = []
-    batch = "batch_00"
-    filename = f"{batch}.json"
-    with open(filename, 'r') as f:
+    with open(path, 'r') as f:
         datas = json.load(f)
-        for data in datas:
+        for i, data in enumerate(datas):
             if data:
-                print(data["url"])
-                row = convert_course_to_master_csv(data)
+                print(i, ":", data["url"])
+                row = create_csv_rows(data)
                 rows.extend(row)
             else:
-                print("null")
+                print(i, ":", "null")
         df = pd.DataFrame(rows)
-        df.to_csv(f"{batch}.csv", index=False, encoding="utf-8-sig")
+        df.to_csv(f"output_csv/{filename}.csv", index=False, encoding="utf-8-sig")
         print(f"Master CSV created with {len(df.columns)} columns and {len(df)} rows.")  # noqa
+
+
+if __name__ == "__main__":
+    DIR_NAME = "output_json"
+    entries = os.scandir(DIR_NAME)
+    for entry in entries:
+        dump_to_csv(entry.path, entry.name.rstrip(".json"))
