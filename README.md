@@ -3,6 +3,10 @@
 This branch contain the repository for the udemy scraper that is more reliable
 than the rewrite version or master branch.
 
+> [!NOTE]
+> You have to download sitemap.xml
+> `wget https://www.udemy.com/sitemap.xml`
+
 ## Note
 
 - [x] **Phase 1**
